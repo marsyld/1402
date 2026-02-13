@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>💘 Валентинка</title>
+  <title>💘</title>
   <style>
     :root{
       --bg1:#ffdee9;
@@ -17,7 +17,7 @@
       min-height:100vh;
       display:grid;
       place-items:center;
-      font-family: system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+      font-family: system-ui,-apple-system, Segoe UI, Roboto, Arial, sans-serif;
       background:
         radial-gradient(1200px 800px at 20% 20%, var(--bg1), transparent),
         radial-gradient(1200px 800px at 80% 80%, var(--bg2), transparent),
@@ -26,7 +26,6 @@
       overflow:hidden;
     }
 
-    /* фоновые сердечки */
     .hearts{
       position: fixed;
       inset: 0;
@@ -47,12 +46,12 @@
       position:relative;
       z-index:2;
     }
+
     h1{
       margin:0 0 10px;
       font-size: clamp(22px, 4.5vw, 34px);
       line-height:1.15;
     }
-    p{ margin:0 0 18px; opacity:.85; }
 
     .btns{
       display:flex;
@@ -63,6 +62,7 @@
       position:relative;
       z-index:2;
     }
+
     button{
       border:0;
       padding:12px 18px;
@@ -74,6 +74,7 @@
       line-height:1;
       transition: transform .08s ease, box-shadow .2s ease, opacity .2s ease;
     }
+
     #yes{
       background:#ff4d6d;
       color:#fff;
@@ -81,12 +82,12 @@
     }
     #yes:active{ transform: translateY(1px) scale(.99); }
 
-    /* Большая "Нет" — не кликабельна, исчезает на hover/touch */
     #no{
       background:#111827;
       color:#fff;
       box-shadow:0 10px 25px rgba(17,24,39,.25);
     }
+
     .hiddenish{
       opacity:0;
       pointer-events:none;
@@ -101,6 +102,7 @@
       position:relative;
       z-index:2;
     }
+
     @keyframes pop{
       from{ transform: scale(.96); opacity:0; }
       to{ transform: scale(1); opacity:1; }
@@ -113,6 +115,7 @@
       position:relative;
       z-index:2;
     }
+
     .media img{
       width:min(420px, 90vw);
       border-radius:18px;
@@ -142,6 +145,7 @@
       position:relative;
       z-index:2;
     }
+
     .mini-no{
       padding:6px 10px;
       border-radius:999px;
@@ -153,7 +157,6 @@
     }
     .mini-no:active{ transform: translateY(1px); }
 
-    /* Оверлей с дублями на всю страницу */
     .overlay{
       position: fixed;
       inset: 0;
@@ -164,11 +167,13 @@
       overflow: auto;
       padding: 18px;
     }
+
     .overlay-inner{
-      max-width: 1200px;
+      max-width: 1300px;
       margin: 0 auto;
       padding-bottom: 28px;
     }
+
     .overlay-head{
       position: sticky;
       top: 0;
@@ -183,11 +188,13 @@
       box-shadow: 0 12px 35px rgba(0,0,0,.12);
       z-index: 6;
     }
+
     .overlay-title{
       font-weight: 700;
       font-size: 16px;
       opacity: .9;
     }
+
     .close{
       padding: 10px 14px;
       border-radius: 12px;
@@ -201,12 +208,14 @@
     .grid{
       margin-top: 14px;
       display:grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 14px;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
     }
-    @media (max-width: 760px){
-      .grid{ grid-template-columns: repeat(2, 1fr); gap: 12px; }
+
+    @media (min-width: 900px){
+      .grid{ grid-template-columns: repeat(3, 1fr); }
     }
+
     .grid img{
       width:100%;
       aspect-ratio: 4 / 5;
@@ -215,16 +224,58 @@
       border: 2px solid rgba(255,255,255,.9);
       box-shadow: 0 18px 45px rgba(0,0,0,.16);
       background: #fff;
+      cursor: pointer;
+    }
+
+    .reveal{
+      position: fixed;
+      inset: 0;
+      z-index: 7;
+      display: none;
+      overflow: auto;
+      padding: 18px;
+      background: rgba(255,255,255,.14);
+      backdrop-filter: blur(3px);
+    }
+
+    .reveal-inner{
+      width: min(980px, 96vw);
+      margin: 0 auto;
+      background: rgba(255,255,255,.82);
+      border: 1px solid rgba(255,255,255,.7);
+      border-radius: 22px;
+      box-shadow: 0 20px 60px rgba(0,0,0,.18);
+      padding: 18px;
+    }
+
+    .reveal-top{
+      display:flex;
+      justify-content: space-between;
+      align-items:center;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .reveal-text{
+      font-weight: 800;
+      font-size: 18px;
+      opacity: .95;
+    }
+
+    .reveal-img{
+      width: 100%;
+      border-radius: 18px;
+      border: 2px solid rgba(255,255,255,.9);
+      box-shadow: 0 18px 45px rgba(0,0,0,.16);
+      display:block;
     }
   </style>
 </head>
 <body>
-  <!-- Сердечки на фоне -->
   <canvas id="heartsCanvas" class="hearts"></canvas>
 
   <div class="card">
-    <h1>Будешь моей валентинкой? 💘</h1>
-    <p>Выбери вариант 👇</p>
+    <h1>будешь моей валентинкой? 🐱</h1>
 
     <div class="btns" id="startBtns">
       <button id="yes">Да</button>
@@ -232,29 +283,36 @@
     </div>
 
     <div class="result" id="result">
-      <div class="badge">Окей 😄</div>
+      <div class="badge">окей 😄</div>
 
-      <!-- GIF вместо фотки -->
       <div class="media">
-        <!-- Положи рядом valentine.gif -->
         <img src="valentine.gif" alt="GIF" />
       </div>
 
       <div class="hint">
-        <span>ладно, ради шутки нажми нет</span>
+        <span>ладно, ради шутки нажми</span>
         <button class="mini-no" id="miniNo" type="button">нет</button>
       </div>
     </div>
   </div>
 
-  <!-- Оверлей дублей -->
   <div class="overlay" id="overlay" aria-hidden="true">
     <div class="overlay-inner">
       <div class="overlay-head">
-        <div class="overlay-title">ну раз нажала… держи много меня 😌</div>
+        <div class="overlay-title">ищи теперь)))</div>
         <button class="close" id="closeOverlay" type="button">закрыть</button>
       </div>
       <div class="grid" id="grid"></div>
+    </div>
+  </div>
+
+  <div class="reveal" id="reveal" aria-hidden="true">
+    <div class="reveal-inner">
+      <div class="reveal-top">
+        <div class="reveal-text" id="revealText">нашла 😼</div>
+        <button class="close" id="closeReveal" type="button">закрыть</button>
+      </div>
+      <img class="reveal-img" id="revealImg" src="photo3.jpg" alt="Фото" />
     </div>
   </div>
 
@@ -269,7 +327,11 @@
     const closeOverlay = document.getElementById("closeOverlay");
     const grid = document.getElementById("grid");
 
-    // ===== 1) Большая "Нет": исчезает при наведении, не кликабельна =====
+    const reveal = document.getElementById("reveal");
+    const closeReveal = document.getElementById("closeReveal");
+    const revealImg = document.getElementById("revealImg");
+    const revealText = document.getElementById("revealText");
+
     function hideNoTemporarily() {
       if (noBtn.classList.contains("hiddenish")) return;
       noBtn.classList.add("hiddenish");
@@ -286,24 +348,27 @@
       hideNoTemporarily();
     });
 
-    // ===== 2) Нажали "Да": показываем GIF + взрыв сердечек =====
     yesBtn.addEventListener("click", () => {
       result.style.display = "block";
       startBtns.style.display = "none";
       burstHearts();
     });
 
-    // ===== 3) Мини-"нет": оверлей на всю страницу с большими дублями =====
-    const photo2 = "photo2.jpg"; // Положи рядом photo2.jpg
-    const duplicates = 48;       // "дофига" — можешь увеличить до 80+
+    const photo2 = "photo2.jpg";
+    const photo3 = "photo3.jpg";
+    const duplicates = 88;
+
+    let secretIndex = -1;
 
     function buildGrid() {
       grid.innerHTML = "";
+      secretIndex = Math.floor(Math.random() * duplicates);
+
       for (let i = 0; i < duplicates; i++) {
         const img = document.createElement("img");
-        // cache-bust чтобы обновления файла точно подхватывались
         img.src = photo2 + "?v=" + i;
         img.alt = "Фото " + (i + 1);
+        img.dataset.i = String(i);
         grid.appendChild(img);
       }
     }
@@ -312,28 +377,51 @@
       buildGrid();
       overlay.style.display = "block";
       overlay.setAttribute("aria-hidden", "false");
-      // блокируем фон
-      document.body.style.overflow = "hidden";
     }
 
     function closeOverlayFn() {
       overlay.style.display = "none";
       overlay.setAttribute("aria-hidden", "true");
-      document.body.style.overflow = "hidden"; // у нас и так hidden в body, оставляем как есть
+    }
+
+    function openReveal() {
+      revealImg.src = photo3 + "?v=" + Date.now();
+      revealText.textContent = "нашла 😼";
+      reveal.style.display = "block";
+      reveal.setAttribute("aria-hidden", "false");
+    }
+
+    function closeRevealFn() {
+      reveal.style.display = "none";
+      reveal.setAttribute("aria-hidden", "true");
     }
 
     miniNo.addEventListener("click", openOverlay);
     closeOverlay.addEventListener("click", closeOverlayFn);
 
-    // закрытие по клику вне контента и по ESC
     overlay.addEventListener("click", (e) => {
       if (e.target === overlay) closeOverlayFn();
     });
-    window.addEventListener("keydown", (e) => {
-      if (e.key === "Escape" && overlay.style.display === "block") closeOverlayFn();
+
+    closeReveal.addEventListener("click", closeRevealFn);
+    reveal.addEventListener("click", (e) => {
+      if (e.target === reveal) closeRevealFn();
     });
 
-    // ===== Сердечки: фон + конфетти =====
+    window.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") {
+        if (reveal.style.display === "block") closeRevealFn();
+        else if (overlay.style.display === "block") closeOverlayFn();
+      }
+    });
+
+    grid.addEventListener("click", (e) => {
+      const t = e.target;
+      if (!t || t.tagName !== "IMG") return;
+      const i = Number(t.dataset.i);
+      if (i === secretIndex) openReveal();
+    });
+
     const canvas = document.getElementById("heartsCanvas");
     const ctx = canvas.getContext("2d");
     const hearts = [];
@@ -364,7 +452,6 @@
       }
     }
 
-    // лёгкий дождик всегда
     setInterval(()=>{
       if(Math.random() < 0.55){
         spawnHeart(Math.random()*window.innerWidth, window.innerHeight + 20);
@@ -389,7 +476,7 @@
     }
 
     function animateHearts(){
-      ctx.clearRect(0,0,canvas.width,cavasHeight());
+      ctx.clearRect(0,0,canvas.width,canvas.height);
       for(let i=hearts.length-1;i>=0;i--){
         const h = hearts[i];
         h.x += h.vx;
@@ -405,13 +492,7 @@
       requestAnimationFrame(animateHearts);
     }
 
-    function cavasHeight(){
-      return canvas.height;
-    }
-
-    // старт
     (function start(){
-      // маленький стартовый акцент
       setTimeout(() => {
         for(let i=0;i<10;i++){
           spawnHeart(Math.random()*window.innerWidth, window.innerHeight + 20);
