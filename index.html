@@ -40,4 +40,228 @@
     h1{
       margin:0 0 10px;
       font-size: clamp(22px, 4.5vw, 34px);
-      line-height:1
+      line-height:1.15;
+    }
+    p{ margin:0 0 18px; opacity:.85; }
+
+    .btns{
+      display:flex;
+      gap:12px;
+      justify-content:center;
+      flex-wrap:wrap;
+      margin-top:10px;
+    }
+    button{
+      border:0;
+      padding:12px 18px;
+      border-radius:14px;
+      font-size:16px;
+      cursor:pointer;
+      user-select:none;
+      touch-action: manipulation;
+      line-height:1;
+      transition: transform .08s ease, box-shadow .2s ease, opacity .2s ease;
+    }
+    #yes{
+      background:#ff4d6d;
+      color:#fff;
+      box-shadow:0 10px 25px rgba(255,77,109,.35);
+    }
+    #yes:active{ transform: translateY(1px) scale(.99); }
+
+    /* Большая "Нет" — по сценарию не кликабельна */
+    #no{
+      background:#111827;
+      color:#fff;
+      box-shadow:0 10px 25px rgba(17,24,39,.25);
+    }
+
+    .hiddenish{
+      opacity:0;
+      pointer-events:none; /* чтобы точно не кликалась */
+      transform: scale(.96);
+    }
+
+    .result{
+      display:none;
+      margin-top:18px;
+      animation: pop .35s ease;
+      text-align:center;
+    }
+    @keyframes pop{
+      from{ transform: scale(.96); opacity:0; }
+      to{ transform: scale(1); opacity:1; }
+    }
+
+    .media{
+      margin-top:12px;
+      display:grid;
+      place-items:center;
+    }
+    .media img{
+      width:min(380px, 86vw);
+      border-radius:18px;
+      border:2px solid #ffffffaa;
+      box-shadow:0 16px 45px rgba(0,0,0,.18);
+      display:block;
+    }
+
+    .hint{
+      margin-top:14px;
+      display:flex;
+      gap:10px;
+      justify-content:center;
+      align-items:center;
+      flex-wrap:wrap;
+      font-size:16px;
+    }
+    .mini-no{
+      padding:6px 10px;
+      border-radius:999px;
+      font-size:13px;
+      background:#111827;
+      color:#fff;
+      opacity:.9;
+      box-shadow:0 8px 18px rgba(17,24,39,.18);
+    }
+    .mini-no:active{ transform: translateY(1px); }
+
+    .gallery{
+      display:none;
+      margin-top:14px;
+      padding:12px;
+      border-radius:18px;
+      border:1px solid #ffffffaa;
+      background:#ffffffb8;
+    }
+    .grid{
+      display:grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap:8px;
+    }
+    @media (max-width: 520px){
+      .grid{ grid-template-columns: repeat(3, 1fr); }
+    }
+    .grid img{
+      width:100%;
+      aspect-ratio: 1 / 1;
+      object-fit: cover;
+      border-radius:12px;
+      border:1px solid #ffffffcc;
+      box-shadow:0 10px 25px rgba(0,0,0,.10);
+    }
+    .badge{
+      display:inline-block;
+      margin-top:10px;
+      padding:8px 12px;
+      border-radius:999px;
+      background:#ffffffd9;
+      border:1px solid #ffffffaa;
+      font-weight:600;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Будешь моей валентинкой? 💘</h1>
+    <p>Выбери вариант 👇</p>
+
+    <div class="btns" id="startBtns">
+      <button id="yes">Да</button>
+      <button id="no" type="button" aria-label="Нет">Нет</button>
+    </div>
+
+    <div class="result" id="result">
+      <div class="badge">Окей 😄</div>
+
+      <!-- GIF вместо фотки -->
+      <div class="media">
+        <!-- замени имя файла при необходимости -->
+        <img src="valentine.gif" alt="GIF" />
+      </div>
+
+      <div class="hint">
+        <span>ладно, ради шутки нажми нет</span>
+        <button class="mini-no" id="miniNo" type="button">нет</button>
+      </div>
+
+      <div class="gallery" id="gallery">
+        <div style="opacity:.85;margin:0 0 10px;">ну раз нажала… держи много меня 😌</div>
+        <div class="grid" id="grid"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const yesBtn = document.getElementById("yes");
+    const noBtn = document.getElementById("no");
+    const result = document.getElementById("result");
+    const startBtns = document.getElementById("startBtns");
+
+    const miniNo = document.getElementById("miniNo");
+    const gallery = document.getElementById("gallery");
+    const grid = document.getElementById("grid");
+
+    // 1) "Нет" не кликабельна + исчезает при наведении
+    function hideNoTemporarily() {
+      // уже спрятана — не спамим
+      if (noBtn.classList.contains("hiddenish")) return;
+
+      noBtn.classList.add("hiddenish");
+
+      // Через время возвращаем (чтобы не пропала навсегда)
+      setTimeout(() => {
+        noBtn.classList.remove("hiddenish");
+      }, 800);
+    }
+
+    // Desktop hover
+    noBtn.addEventListener("mouseenter", hideNoTemporarily);
+
+    // Mobile touch (чтобы тоже исчезала)
+    noBtn.addEventListener("touchstart", (e) => {
+      e.preventDefault();
+      hideNoTemporarily();
+    }, { passive: false });
+
+    // На случай если кто-то попробует кликнуть — глушим
+    noBtn.addEventListener("click", (e) => {
+      e.preventDefault();
+      hideNoTemporarily();
+    });
+
+    // 2) Нажали "Да" — показываем GIF + сценарий с мини-нет
+    yesBtn.addEventListener("click", () => {
+      result.style.display = "block";
+      // можно оставить стартовые кнопки, но обычно красивее скрыть
+      startBtns.style.display = "none";
+    });
+
+    // 3) Мини-кнопка "нет" — показываем много дублей второй фотки
+    const photo2 = "photo2.jpg"; // поменяй, если файл называется иначе
+    const duplicates = 16;       // сколько дублей показать
+
+    function buildGrid() {
+      grid.innerHTML = "";
+      for (let i = 0; i < duplicates; i++) {
+        const img = document.createElement("img");
+        // cache-bust чтобы не залипало при обновлениях
+        img.src = photo2 + "?v=" + i;
+        img.alt = "Фото " + (i+1);
+        grid.appendChild(img);
+      }
+    }
+
+    miniNo.addEventListener("click", () => {
+      if (gallery.style.display === "block") {
+        gallery.style.display = "none";
+        return;
+      }
+      buildGrid();
+      gallery.style.display = "block";
+      // лёгкий скролл к галерее (на мобиле приятно)
+      gallery.scrollIntoView({ behavior: "smooth", block: "center" });
+    });
+  </script>
+</body>
+</html>
