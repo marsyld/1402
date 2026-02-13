@@ -5,319 +5,39 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>💘 Валентинка</title>
   <style>
-    :root {
+    :root{
       --bg1:#ffdee9;
       --bg2:#b5fffc;
       --card:#ffffffcc;
-      --text:#1f2937;
+      --text:#111827;
     }
-    * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      min-height: 100vh;
-      display: grid;
-      place-items: center;
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-      background: radial-gradient(1200px 800px at 20% 20%, var(--bg1), transparent),
-                  radial-gradient(1200px 800px at 80% 80%, var(--bg2), transparent),
-                  #fff;
-      color: var(--text);
-      overflow: hidden;
+    *{ box-sizing:border-box; }
+    body{
+      margin:0;
+      min-height:100vh;
+      display:grid;
+      place-items:center;
+      font-family: system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+      background:
+        radial-gradient(1200px 800px at 20% 20%, var(--bg1), transparent),
+        radial-gradient(1200px 800px at 80% 80%, var(--bg2), transparent),
+        #fff;
+      color:var(--text);
+      overflow:hidden;
     }
-    .card {
-      width: min(92vw, 560px);
-      background: var(--card);
+    .card{
+      width:min(92vw, 640px);
+      background:var(--card);
       backdrop-filter: blur(10px);
-      border: 1px solid #ffffff80;
-      border-radius: 24px;
-      padding: 28px 22px;
-      box-shadow: 0 20px 60px rgba(0,0,0,.12);
-      text-align: center;
-      position: relative;
-      z-index: 1;
+      border:1px solid #ffffff80;
+      border-radius:24px;
+      padding:28px 22px;
+      box-shadow:0 20px 60px rgba(0,0,0,.12);
+      text-align:center;
+      position:relative;
+      z-index:1;
     }
-    h1 {
-      margin: 0 0 10px;
+    h1{
+      margin:0 0 10px;
       font-size: clamp(22px, 4.5vw, 34px);
-      line-height: 1.15;
-    }
-    p { margin: 0 0 18px; opacity: .85; }
-
-    .btns {
-      display: flex;
-      gap: 12px;
-      justify-content: center;
-      flex-wrap: wrap;
-      margin-top: 10px;
-      position: relative;
-      z-index: 2;
-    }
-
-    button {
-      border: 0;
-      padding: 12px 18px;
-      border-radius: 14px;
-      font-size: 16px;
-      cursor: pointer;
-      transition: transform .08s ease, box-shadow .2s ease, opacity .2s ease;
-      user-select: none;
-      touch-action: manipulation;
-      line-height: 1;
-    }
-
-    #yes {
-      background: #ff4d6d;
-      color: white;
-      box-shadow: 0 10px 25px rgba(255,77,109,.35);
-    }
-    #yes:active { transform: translateY(1px) scale(.99); }
-
-    /* СТАРТОВО: "Нет" обычная кнопка в ряду */
-    #no {
-      background: #111827;
-      color: white;
-      box-shadow: 0 10px 25px rgba(17,24,39,.25);
-      position: relative; /* потом переключим на fixed */
-    }
-
-    .result {
-      margin-top: 18px;
-      display: none;
-      animation: pop .35s ease;
-    }
-    .result img {
-      width: min(320px, 80vw);
-      border-radius: 18px;
-      border: 2px solid #ffffffaa;
-      box-shadow: 0 16px 45px rgba(0,0,0,.18);
-      display: block;
-      margin: 12px auto 0;
-    }
-    .badge {
-      display: inline-block;
-      margin-top: 10px;
-      padding: 8px 12px;
-      border-radius: 999px;
-      background: #ffffffd9;
-      border: 1px solid #ffffffaa;
-      font-weight: 600;
-    }
-    @keyframes pop {
-      from { transform: scale(.96); opacity: 0; }
-      to { transform: scale(1); opacity: 1; }
-    }
-
-    .hearts {
-      position: fixed;
-      inset: 0;
-      pointer-events: none;
-      opacity: .35;
-      z-index: 0;
-    }
-  </style>
-</head>
-<body>
-  <canvas class="hearts" id="hearts"></canvas>
-
-  <div class="card" id="card">
-    <h1>Будешь моей валентинкой? 💘</h1>
-    <p>Выбор всего один правильный 😄</p>
-
-    <!-- ВАЖНО: "Да" и "Нет" рядом -->
-    <div class="btns" id="btns">
-      <button id="yes">Да</button>
-      <button id="no" aria-label="Нет">Нет</button>
-    </div>
-
-    <div class="result" id="result">
-      <div class="badge">Урааа! 💖</div>
-      <div style="font-size:18px;margin-top:10px;">Тогда держи меня 😌</div>
-      <img id="photo" src="myphoto.jpg" alt="Фото" />
-    </div>
-  </div>
-
-  <script>
-    const noBtn = document.getElementById("no");
-    const yesBtn = document.getElementById("yes");
-    const result = document.getElementById("result");
-
-    // Переключаем "Нет" в режим убегания после первой "попытки"
-    let noIsEscaping = false;
-
-    function clamp(v, min, max){ return Math.max(min, Math.min(max, v)); }
-
-    function enableNoEscapeMode() {
-      if (noIsEscaping) return;
-      noIsEscaping = true;
-
-      // Берём текущую позицию кнопки в ряду и ставим её туда же, но уже fixed
-      const rect = noBtn.getBoundingClientRect();
-      noBtn.style.position = "fixed";
-      noBtn.style.left = rect.left + "px";
-      noBtn.style.top = rect.top + "px";
-      noBtn.style.transform = "none";
-      noBtn.style.zIndex = "9999";
-      noBtn.style.willChange = "left, top";
-
-      // чуть плавности
-      noBtn.style.transition = "left .08s ease, top .08s ease, transform .08s ease, box-shadow .2s ease, opacity .2s ease";
-    }
-
-    function safeMoveNoButton(nearX = null, nearY = null) {
-      enableNoEscapeMode();
-
-      const padding = 14;
-      const w = noBtn.offsetWidth;
-      const h = noBtn.offsetHeight;
-
-      const minX = padding;
-      const minY = padding;
-      const maxX = window.innerWidth  - w - padding;
-      const maxY = window.innerHeight - h - padding;
-
-      // если экран слишком маленький — держим кнопку внизу по центру
-      if (maxX <= minX || maxY <= minY) {
-        noBtn.style.left = "50%";
-        noBtn.style.top = "80%";
-        noBtn.style.transform = "translate(-50%, -50%)";
-        return;
-      }
-
-      let x = Math.random() * (maxX - minX) + minX;
-      let y = Math.random() * (maxY - minY) + minY;
-
-      // Если есть координаты "погони" — улетаем подальше от них
-      if (nearX !== null && nearY !== null) {
-        const fromLeft = (nearX < window.innerWidth / 2);
-        const fromTop  = (nearY < window.innerHeight / 2);
-
-        // толкаем в противоположный квадрант
-        x = fromLeft ? (Math.random() * (maxX - window.innerWidth/2) + window.innerWidth/2)
-                     : (Math.random() * (window.innerWidth/2 - minX) + minX);
-
-        y = fromTop  ? (Math.random() * (maxY - window.innerHeight/2) + window.innerHeight/2)
-                     : (Math.random() * (window.innerHeight/2 - minY) + minY);
-
-        // финальная страховка
-        x = clamp(x, minX, maxX);
-        y = clamp(y, minY, maxY);
-      }
-
-      noBtn.style.left = x + "px";
-      noBtn.style.top  = y + "px";
-      noBtn.style.transform = "none";
-    }
-
-    // Страховка: если кнопка вдруг оказалась вне видимой области (из-за ресайза/скролла и т.п.)
-    function ensureNoVisible() {
-      if (!noIsEscaping) return;
-
-      const r = noBtn.getBoundingClientRect();
-      const margin = 6;
-      const out =
-        r.right < margin ||
-        r.bottom < margin ||
-        r.left > window.innerWidth - margin ||
-        r.top > window.innerHeight - margin;
-
-      if (out) safeMoveNoButton(window.innerWidth/2, window.innerHeight/2);
-    }
-
-    window.addEventListener("resize", () => {
-      // при ресайзе просто гарантируем, что кнопка видна
-      ensureNoVisible();
-    });
-
-    // Убегает при наведении мыши (после первой активации escape режима)
-    noBtn.addEventListener("mouseenter", (e) => safeMoveNoButton(e.clientX, e.clientY));
-
-    // На мобиле: убегает, когда палец пытается нажать
-    noBtn.addEventListener("touchstart", (e) => {
-      const t = e.touches[0];
-      safeMoveNoButton(t.clientX, t.clientY);
-      e.preventDefault();
-    }, { passive: false });
-
-    // Если всё-таки кликнули — тоже улетает
-    noBtn.addEventListener("click", (e) => safeMoveNoButton(e.clientX, e.clientY));
-
-    // "Да" показывает фотку и прячет "Нет"
-    yesBtn.addEventListener("click", () => {
-      result.style.display = "block";
-      noBtn.style.display = "none";
-      yesBtn.disabled = true;
-      yesBtn.style.opacity = "0.7";
-      burstHearts();
-    });
-
-    // Сердечки
-    const c = document.getElementById("hearts");
-    const ctx = c.getContext("2d");
-    const hearts = [];
-    function resizeCanvas(){
-      c.width = window.innerWidth;
-      c.height = window.innerHeight;
-    }
-    window.addEventListener("resize", resizeCanvas);
-    resizeCanvas();
-
-    function spawnHeart(x, y, big=false){
-      hearts.push({
-        x, y,
-        vy: -(2 + Math.random()*2) * (big ? 1.4 : 1),
-        vx: (Math.random()*2-1) * (big ? 1.2 : 1),
-        s: (6 + Math.random()*10) * (big ? 1.6 : 1),
-        a: 1,
-        r: Math.random()*Math.PI
-      });
-    }
-
-    function burstHearts(){
-      const cx = window.innerWidth/2;
-      const cy = window.innerHeight/2;
-      for(let i=0;i<26;i++) spawnHeart(cx + (Math.random()*120-60), cy + (Math.random()*60-30), true);
-    }
-
-    // лёгкий "дождь" сердец
-    setInterval(() => {
-      if (Math.random() < 0.6) spawnHeart(Math.random()*window.innerWidth, window.innerHeight + 10);
-    }, 220);
-
-    function drawHeart(x,y,s,rot,alpha){
-      ctx.save();
-      ctx.translate(x,y);
-      ctx.rotate(rot);
-      ctx.globalAlpha = alpha;
-      ctx.fillStyle = "#ff4d6d";
-      ctx.beginPath();
-      const k = s/16;
-      ctx.moveTo(0, 6*k);
-      ctx.bezierCurveTo(0, 0, -8*k, 0, -8*k, 6*k);
-      ctx.bezierCurveTo(-8*k, 12*k, 0, 14*k, 0, 18*k);
-      ctx.bezierCurveTo(0, 14*k, 8*k, 12*k, 8*k, 6*k);
-      ctx.bezierCurveTo(8*k, 0, 0, 0, 0, 6*k);
-      ctx.fill();
-      ctx.restore();
-    }
-
-    function tick(){
-      ctx.clearRect(0,0,c.width,c.height);
-      for(let i=hearts.length-1;i>=0;i--){
-        const h = hearts[i];
-        h.x += h.vx;
-        h.y += h.vy;
-        h.vy -= 0.02;
-        h.a -= 0.012;
-        h.r += 0.02;
-        drawHeart(h.x,h.y,h.s,h.r,Math.max(0,h.a));
-        if (h.a <= 0) hearts.splice(i,1);
-      }
-      requestAnimationFrame(tick);
-    }
-    tick();
-
-    // периодическая страховка (мало ли)
-    setInterval(ensureNoVisible, 800);
-  </script>
-</body>
-</html>
+      line-height:1
