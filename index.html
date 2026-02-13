@@ -25,8 +25,18 @@
       color:var(--text);
       overflow:hidden;
     }
+
+    /* фоновые сердечки */
+    .hearts{
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      opacity: .35;
+    }
+
     .card{
-      width:min(92vw, 640px);
+      width:min(92vw, 680px);
       background:var(--card);
       backdrop-filter: blur(10px);
       border:1px solid #ffffff80;
@@ -35,7 +45,7 @@
       box-shadow:0 20px 60px rgba(0,0,0,.12);
       text-align:center;
       position:relative;
-      z-index:1;
+      z-index:2;
     }
     h1{
       margin:0 0 10px;
@@ -50,6 +60,8 @@
       justify-content:center;
       flex-wrap:wrap;
       margin-top:10px;
+      position:relative;
+      z-index:2;
     }
     button{
       border:0;
@@ -69,16 +81,15 @@
     }
     #yes:active{ transform: translateY(1px) scale(.99); }
 
-    /* Большая "Нет" — по сценарию не кликабельна */
+    /* Большая "Нет" — не кликабельна, исчезает на hover/touch */
     #no{
       background:#111827;
       color:#fff;
       box-shadow:0 10px 25px rgba(17,24,39,.25);
     }
-
     .hiddenish{
       opacity:0;
-      pointer-events:none; /* чтобы точно не кликалась */
+      pointer-events:none;
       transform: scale(.96);
     }
 
@@ -87,6 +98,8 @@
       margin-top:18px;
       animation: pop .35s ease;
       text-align:center;
+      position:relative;
+      z-index:2;
     }
     @keyframes pop{
       from{ transform: scale(.96); opacity:0; }
@@ -97,13 +110,25 @@
       margin-top:12px;
       display:grid;
       place-items:center;
+      position:relative;
+      z-index:2;
     }
     .media img{
-      width:min(380px, 86vw);
+      width:min(420px, 90vw);
       border-radius:18px;
       border:2px solid #ffffffaa;
       box-shadow:0 16px 45px rgba(0,0,0,.18);
       display:block;
+    }
+
+    .badge{
+      display:inline-block;
+      margin-top:10px;
+      padding:8px 12px;
+      border-radius:999px;
+      background:#ffffffd9;
+      border:1px solid #ffffffaa;
+      font-weight:600;
     }
 
     .hint{
@@ -114,6 +139,8 @@
       align-items:center;
       flex-wrap:wrap;
       font-size:16px;
+      position:relative;
+      z-index:2;
     }
     .mini-no{
       padding:6px 10px;
@@ -126,42 +153,75 @@
     }
     .mini-no:active{ transform: translateY(1px); }
 
-    .gallery{
-      display:none;
-      margin-top:14px;
-      padding:12px;
-      border-radius:18px;
-      border:1px solid #ffffffaa;
-      background:#ffffffb8;
+    /* Оверлей с дублями на всю страницу */
+    .overlay{
+      position: fixed;
+      inset: 0;
+      background: rgba(255,255,255,.08);
+      backdrop-filter: blur(2px);
+      z-index: 5;
+      display: none;
+      overflow: auto;
+      padding: 18px;
     }
+    .overlay-inner{
+      max-width: 1200px;
+      margin: 0 auto;
+      padding-bottom: 28px;
+    }
+    .overlay-head{
+      position: sticky;
+      top: 0;
+      display:flex;
+      justify-content: space-between;
+      align-items:center;
+      gap:12px;
+      padding: 12px 10px;
+      border-radius: 16px;
+      background: rgba(255,255,255,.78);
+      border: 1px solid rgba(255,255,255,.65);
+      box-shadow: 0 12px 35px rgba(0,0,0,.12);
+      z-index: 6;
+    }
+    .overlay-title{
+      font-weight: 700;
+      font-size: 16px;
+      opacity: .9;
+    }
+    .close{
+      padding: 10px 14px;
+      border-radius: 12px;
+      background:#111827;
+      color:#fff;
+      font-size: 14px;
+      box-shadow:0 10px 25px rgba(17,24,39,.22);
+    }
+    .close:active{ transform: translateY(1px); }
+
     .grid{
+      margin-top: 14px;
       display:grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap:8px;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
     }
-    @media (max-width: 520px){
-      .grid{ grid-template-columns: repeat(3, 1fr); }
+    @media (max-width: 760px){
+      .grid{ grid-template-columns: repeat(2, 1fr); gap: 12px; }
     }
     .grid img{
       width:100%;
-      aspect-ratio: 1 / 1;
+      aspect-ratio: 4 / 5;
       object-fit: cover;
-      border-radius:12px;
-      border:1px solid #ffffffcc;
-      box-shadow:0 10px 25px rgba(0,0,0,.10);
-    }
-    .badge{
-      display:inline-block;
-      margin-top:10px;
-      padding:8px 12px;
-      border-radius:999px;
-      background:#ffffffd9;
-      border:1px solid #ffffffaa;
-      font-weight:600;
+      border-radius: 18px;
+      border: 2px solid rgba(255,255,255,.9);
+      box-shadow: 0 18px 45px rgba(0,0,0,.16);
+      background: #fff;
     }
   </style>
 </head>
 <body>
+  <!-- Сердечки на фоне -->
+  <canvas id="heartsCanvas" class="hearts"></canvas>
+
   <div class="card">
     <h1>Будешь моей валентинкой? 💘</h1>
     <p>Выбери вариант 👇</p>
@@ -176,7 +236,7 @@
 
       <!-- GIF вместо фотки -->
       <div class="media">
-        <!-- замени имя файла при необходимости -->
+        <!-- Положи рядом valentine.gif -->
         <img src="valentine.gif" alt="GIF" />
       </div>
 
@@ -184,11 +244,17 @@
         <span>ладно, ради шутки нажми нет</span>
         <button class="mini-no" id="miniNo" type="button">нет</button>
       </div>
+    </div>
+  </div>
 
-      <div class="gallery" id="gallery">
-        <div style="opacity:.85;margin:0 0 10px;">ну раз нажала… держи много меня 😌</div>
-        <div class="grid" id="grid"></div>
+  <!-- Оверлей дублей -->
+  <div class="overlay" id="overlay" aria-hidden="true">
+    <div class="overlay-inner">
+      <div class="overlay-head">
+        <div class="overlay-title">ну раз нажала… держи много меня 😌</div>
+        <button class="close" id="closeOverlay" type="button">закрыть</button>
       </div>
+      <div class="grid" id="grid"></div>
     </div>
   </div>
 
@@ -199,69 +265,160 @@
     const startBtns = document.getElementById("startBtns");
 
     const miniNo = document.getElementById("miniNo");
-    const gallery = document.getElementById("gallery");
+    const overlay = document.getElementById("overlay");
+    const closeOverlay = document.getElementById("closeOverlay");
     const grid = document.getElementById("grid");
 
-    // 1) "Нет" не кликабельна + исчезает при наведении
+    // ===== 1) Большая "Нет": исчезает при наведении, не кликабельна =====
     function hideNoTemporarily() {
-      // уже спрятана — не спамим
       if (noBtn.classList.contains("hiddenish")) return;
-
       noBtn.classList.add("hiddenish");
-
-      // Через время возвращаем (чтобы не пропала навсегда)
-      setTimeout(() => {
-        noBtn.classList.remove("hiddenish");
-      }, 800);
+      setTimeout(() => noBtn.classList.remove("hiddenish"), 900);
     }
 
-    // Desktop hover
     noBtn.addEventListener("mouseenter", hideNoTemporarily);
-
-    // Mobile touch (чтобы тоже исчезала)
     noBtn.addEventListener("touchstart", (e) => {
       e.preventDefault();
       hideNoTemporarily();
     }, { passive: false });
-
-    // На случай если кто-то попробует кликнуть — глушим
     noBtn.addEventListener("click", (e) => {
       e.preventDefault();
       hideNoTemporarily();
     });
 
-    // 2) Нажали "Да" — показываем GIF + сценарий с мини-нет
+    // ===== 2) Нажали "Да": показываем GIF + взрыв сердечек =====
     yesBtn.addEventListener("click", () => {
       result.style.display = "block";
-      // можно оставить стартовые кнопки, но обычно красивее скрыть
       startBtns.style.display = "none";
+      burstHearts();
     });
 
-    // 3) Мини-кнопка "нет" — показываем много дублей второй фотки
-    const photo2 = "photo2.jpg"; // поменяй, если файл называется иначе
-    const duplicates = 16;       // сколько дублей показать
+    // ===== 3) Мини-"нет": оверлей на всю страницу с большими дублями =====
+    const photo2 = "photo2.jpg"; // Положи рядом photo2.jpg
+    const duplicates = 48;       // "дофига" — можешь увеличить до 80+
 
     function buildGrid() {
       grid.innerHTML = "";
       for (let i = 0; i < duplicates; i++) {
         const img = document.createElement("img");
-        // cache-bust чтобы не залипало при обновлениях
+        // cache-bust чтобы обновления файла точно подхватывались
         img.src = photo2 + "?v=" + i;
-        img.alt = "Фото " + (i+1);
+        img.alt = "Фото " + (i + 1);
         grid.appendChild(img);
       }
     }
 
-    miniNo.addEventListener("click", () => {
-      if (gallery.style.display === "block") {
-        gallery.style.display = "none";
-        return;
-      }
+    function openOverlay() {
       buildGrid();
-      gallery.style.display = "block";
-      // лёгкий скролл к галерее (на мобиле приятно)
-      gallery.scrollIntoView({ behavior: "smooth", block: "center" });
+      overlay.style.display = "block";
+      overlay.setAttribute("aria-hidden", "false");
+      // блокируем фон
+      document.body.style.overflow = "hidden";
+    }
+
+    function closeOverlayFn() {
+      overlay.style.display = "none";
+      overlay.setAttribute("aria-hidden", "true");
+      document.body.style.overflow = "hidden"; // у нас и так hidden в body, оставляем как есть
+    }
+
+    miniNo.addEventListener("click", openOverlay);
+    closeOverlay.addEventListener("click", closeOverlayFn);
+
+    // закрытие по клику вне контента и по ESC
+    overlay.addEventListener("click", (e) => {
+      if (e.target === overlay) closeOverlayFn();
     });
+    window.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && overlay.style.display === "block") closeOverlayFn();
+    });
+
+    // ===== Сердечки: фон + конфетти =====
+    const canvas = document.getElementById("heartsCanvas");
+    const ctx = canvas.getContext("2d");
+    const hearts = [];
+
+    function resizeCanvas(){
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    window.addEventListener("resize", resizeCanvas);
+    resizeCanvas();
+
+    function spawnHeart(x, y, big=false){
+      hearts.push({
+        x, y,
+        vx: (Math.random()*2 - 1) * (big ? 2.2 : 1),
+        vy: -(Math.random()*2 + 1) * (big ? 1.6 : 1),
+        size: (6 + Math.random()*10) * (big ? 1.7 : 1),
+        alpha: 1,
+        rot: Math.random()*Math.PI
+      });
+    }
+
+    function burstHearts(){
+      const cx = window.innerWidth / 2;
+      const cy = window.innerHeight / 2;
+      for(let i=0;i<34;i++){
+        spawnHeart(cx + (Math.random()*160-80), cy + (Math.random()*80-40), true);
+      }
+    }
+
+    // лёгкий дождик всегда
+    setInterval(()=>{
+      if(Math.random() < 0.55){
+        spawnHeart(Math.random()*window.innerWidth, window.innerHeight + 20);
+      }
+    }, 260);
+
+    function drawHeart(x,y,s,rot,alpha){
+      ctx.save();
+      ctx.translate(x,y);
+      ctx.rotate(rot);
+      ctx.globalAlpha = alpha;
+      ctx.fillStyle = "#ff4d6d";
+      ctx.beginPath();
+      const k = s/16;
+      ctx.moveTo(0,6*k);
+      ctx.bezierCurveTo(0,0,-8*k,0,-8*k,6*k);
+      ctx.bezierCurveTo(-8*k,12*k,0,14*k,0,18*k);
+      ctx.bezierCurveTo(0,14*k,8*k,12*k,8*k,6*k);
+      ctx.bezierCurveTo(8*k,0,0,0,0,6*k);
+      ctx.fill();
+      ctx.restore();
+    }
+
+    function animateHearts(){
+      ctx.clearRect(0,0,canvas.width,cavasHeight());
+      for(let i=hearts.length-1;i>=0;i--){
+        const h = hearts[i];
+        h.x += h.vx;
+        h.y += h.vy;
+        h.vy -= 0.02;
+        h.alpha -= 0.012;
+        h.rot += 0.02;
+
+        drawHeart(h.x,h.y,h.size,h.rot,Math.max(0,h.alpha));
+
+        if(h.alpha <= 0) hearts.splice(i,1);
+      }
+      requestAnimationFrame(animateHearts);
+    }
+
+    function cavasHeight(){
+      return canvas.height;
+    }
+
+    // старт
+    (function start(){
+      // маленький стартовый акцент
+      setTimeout(() => {
+        for(let i=0;i<10;i++){
+          spawnHeart(Math.random()*window.innerWidth, window.innerHeight + 20);
+        }
+      }, 400);
+      animateHearts();
+    })();
   </script>
 </body>
 </html>
